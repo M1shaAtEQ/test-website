@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Scraper</title>
+</head>
+<body>
+    <h1>Web Scraper</h1>
+    <p id="result"></p>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const url = 'https://m1shaateq.github.io/test-website/render.php'; // URL of the PHP file
+
+            try {
+                const response = await fetch(url);
+                const text = await response.text();
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(text, 'text/html');
+
+                // Wait for the figures to load
+                const waitForFigures = async (doc, timeout = 10000) => {
+                    const start = Date.now();
+                    while (Date.now() - start < timeout) {
+                        const figures = doc.querySelectorAll('figure');
+                        if (figures.length > 0) {
+                            return figures;
+                        }
+                        await new Promise(resolve => setTimeout(resolve, 100)); // Wait 100ms before checking again
+                    }
+                    return [];
+                };
+
+                const figures = await waitForFigures(doc);
+                document.getElementById('result').textContent = `Number of figures: ${figures.length}`;
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        });
+    </script>
+</body>
+</html>
