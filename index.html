@@ -4,23 +4,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Web Scraper</title>
-    <style>
-        #iframeContainer {
-            width: 100%;
-            height: 600px; /* Adjust the height as needed */
-            border: 1px solid #ccc;
-        }
-        iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-        }
-    </style>
 </head>
 <body>
     <h1>Web Scraper</h1>
-    <div id="iframeContainer">
-        <iframe src="proxy.php"></iframe>
-    </div>
+    <button id="scrapeButton">Scrape Figures</button>
+    <p id="result"></p>
+
+    <script>
+        document.getElementById('scrapeButton').addEventListener('click', () => {
+            const url = 'https://www.saatchiart.com/account/artworks/425707';
+            localStorage.removeItem('figuresCount');
+            window.location.href = `scrape.html?url=${encodeURIComponent(url)}`;
+        });
+
+        // Check if figures count is available in local storage
+        const figuresCount = localStorage.getItem('figuresCount');
+        if (figuresCount !== null) {
+            document.getElementById('result').textContent = `Number of figures: ${figuresCount}`;
+            localStorage.removeItem('figuresCount');
+        }
+    </script>
 </body>
 </html>
