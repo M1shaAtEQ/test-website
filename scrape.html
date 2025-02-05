@@ -10,40 +10,41 @@
         document.addEventListener('DOMContentLoaded', async () => {
             const urlParams = new URLSearchParams(window.location.search);
             const url = urlParams.get('url');
+            const proxyUrl = 'https://cors-anywhere.herokuapp.com/'; // Use a CORS proxy
 
             if (url) {
-                const iframe = document.createElement('iframe');
-                iframe.src = url;
-                iframe.style.display = 'none';
-                document.body.appendChild(iframe);
+                try {
+                    const response = await fetch(proxyUrl + url, {
+                        headers: {
+                            'Origin': 'https://m1shaateq.github.io' // Replace with your domain
+                        }
+                    });
+                    const text = await response.text();
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(text, 'text/html');
 
-                iframe.onload = async () => {
-                    try {
-                        const doc = iframe.contentDocument || iframe.contentWindow.document;
-
-                        // Wait for the figures to load
-                        const waitForFigures = async (doc, timeout = 10000) => {
-                            const start = Date.now();
-                            while (Date.now() - start < timeout) {
-                                const figures = doc.querySelectorAll('figure');
-                                if (figures.length > 0) {
-                                    return figures.length;
-                                }
-                                await new Promise(resolve => setTimeout(resolve, 100)); // Wait 100ms before checking again
+                    // Wait for the figures to load
+                    const waitForFigures = async (doc, timeout = 10000) => {
+                        const start = Date.now();
+                        while (Date.now() - start < timeout) {
+                            const figures = doc.querySelectorAll('figure');
+                            if (figures.length > 0) {
+                                return figures.length;
                             }
-                            return 0;
-                        };
+                            await new Promise(resolve => setTimeout(resolve, 100)); // Wait 100ms before checking again
+                        }
+                        return 0;
+                    };
 
-                        const figuresCount = await waitForFigures(doc);
-                        localStorage.setItem('figuresCount', figuresCount);
-                    } catch (error) {
-                        console.error('Error:', error);
-                        localStorage.setItem('figuresCount', 'Error');
-                    }
+                    const figuresCount = await waitForFigures(doc);
+                    localStorage.setItem('figuresCount', figuresCount);
+                } catch (error) {
+                    console.error('Error:', error);
+                    localStorage.setItem('figuresCount', 'Error');
+                }
 
-                    // Redirect back to the original page
-                    window.location.href = 'index.html';
-                };
+                // Redirect back to the original page
+                window.location.href = 'index.html';
             } else {
                 // Redirect back to the original page if no URL is provided
                 window.location.href = 'index.html';
