@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Scraper</title>
+    <style>
+        #iframeContainer {
+            width: 100%;
+            height: 600px; /* Adjust the height as needed */
+            border: 1px solid #ccc;
+        }
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>Web Scraper</h1>
+    <div id="iframeContainer">
+        <iframe></iframe>
+    </div>
+</body>
+
+<script>
+    const apiUrl = 'https://service.prerender.io/https://www.saatchiart.com/account/artworks/425707';
+    const apiKey = 'NbGLlUUgPo4rNze57gUk';
+
+    fetch(apiUrl, {
+        headers: {
+            'X-Prerender-Token': apiKey
+        }
+    })
+    .then(response => response.text())
+    .then(htmlContent => {
+        const iframe = document.querySelector('#iframeContainer iframe');
+        // load the fetched HTML into the iframe using srcdoc
+        iframe.srcdoc = htmlContent;
+
+        // when the iframe is fully loaded, count the <figure> elements
+        iframe.addEventListener('load', function() {
+            const figures = iframe.contentDocument.querySelectorAll('figure');
+            console.log('Number of figure elements:', figures.length);
+        });
+    })
+    .catch(error => {
+        console.error('Error fetching prerendered content:', error);
+    });
+</script>
+</html>
